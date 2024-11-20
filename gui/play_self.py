@@ -20,7 +20,7 @@ env = NlHoldemEnvWrapper(
 )
 
 #%%
-
+print(env)
 i = 1048
 nn_agent = NNAgent(env.observation_space,
                        env.action_space,
@@ -32,6 +32,7 @@ nn_agent = NNAgent(env.observation_space,
 
 for i in tqdm(range(10)):
     obs = env.reset()
+    print(obs)
     d = False
     while not d:
         action_ind = nn_agent.make_action(obs)
