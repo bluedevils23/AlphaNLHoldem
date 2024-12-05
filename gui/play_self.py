@@ -32,7 +32,7 @@ nn_agent = NNAgent(env.observation_space,
 
 for i in tqdm(range(10)):
     obs = env.reset()
-    print(obs)
+    #print(obs)
     d = False
     while not d:
         action_ind = nn_agent.make_action(obs)
