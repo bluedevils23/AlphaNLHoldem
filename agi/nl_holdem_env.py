@@ -23,6 +23,7 @@ class NlHoldemEnvWrapper():
             'no-limit-holdem',
             config={
                 'seed': seed,
+                'chips_for_each': random.randint(4,200)
             }
         )
         set_seed(seed)

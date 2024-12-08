@@ -4,11 +4,11 @@ h5py==2.10.0
 #pandas==1.1.5
 pandocfilters==1.4.3
 requests==2.24.0
-#scipy==1.5.1
+scipy==1.5.1
 SuperSuit==2.3.0
 tabulate==0.8.7
 tqdm==4.54.1
-ray==0.8.4
+ray==0.8.3
 rlcard==1.1.0
 Flask==1.1.1
 Flask-SocketIO==4.3.1
