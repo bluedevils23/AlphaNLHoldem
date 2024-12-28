@@ -25,8 +25,7 @@ env = NlHoldemEnvWrapper(
 )
 
 #%%
-print(env)
-i = 1048
+i = 1102
 nn_agent = NNAgent(env.observation_space,
                        env.action_space,
                        conf,
@@ -244,7 +243,7 @@ def create_obs_from_env_state(env):
     print('env_history:', env.history)
     # 获取当前合法动作
     legal_actions = [action.value for action in obs[0]["raw_obs"]["legal_actions"]]
-    
+    print('legal_actions:', legal_actions)
     # 获取双方筹码
     stakes = obs[0]["raw_obs"]["stakes"]
     print('stakes:', stakes)
@@ -285,38 +284,38 @@ def test_obs_creation():
             # 使用环境状态创建新的observation
             new_obs = create_obs_from_env_state(env)
             
-            # # 逐个比较各个部分
-            # components = ["card_info", "action_info", "legal_moves", "extra_info"]
+            # 逐个比较各个部分
+            components = ["card_info", "action_info", "legal_moves", "extra_info"]
             
-            # for comp in components:
-            #     print(f"\nComparing {comp}:")
-            #     print(f"Original shape: {original_obs[comp].shape}")
-            #     print(f"New shape: {new_obs[comp].shape}")
+            for comp in components:
+                print(f"\nComparing {comp}:")
+                print(f"Original shape: {original_obs[comp].shape}")
+                print(f"New shape: {new_obs[comp].shape}")
                 
-            #     if original_obs[comp].shape != new_obs[comp].shape:
-            #         print(f"Shape mismatch in {comp}!")
-            #         continue
+                if original_obs[comp].shape != new_obs[comp].shape:
+                    print(f"Shape mismatch in {comp}!")
+                    continue
                     
-            #     # 检查数值是否相等
-            #     is_equal = np.array_equal(original_obs[comp], new_obs[comp])
-            #     print(f"Values are equal: {is_equal}")
+                # 检查数值是否相等
+                is_equal = np.array_equal(original_obs[comp], new_obs[comp])
+                print(f"Values are equal: {is_equal}")
                 
-            #     if not is_equal:
-            #         # 找出不同的位置
-            #         diff_indices = np.where(original_obs[comp] != new_obs[comp])
-            #         print(f"Differences found at indices: {diff_indices}")
-            #         print("Original values at these positions:", original_obs[comp][diff_indices])
-            #         print("New values at these positions:", new_obs[comp][diff_indices])
+                if not is_equal:
+                    # 找出不同的位置
+                    diff_indices = np.where(original_obs[comp] != new_obs[comp])
+                    print(f"Differences found at indices: {diff_indices}")
+                    print("Original values at these positions:", original_obs[comp][diff_indices])
+                    print("New values at these positions:", new_obs[comp][diff_indices])
                     
-            #         # 如果是多维数组，打印第一个不同的位置的完整切片
-            #         if len(diff_indices[0]) > 0:
-            #             first_diff = tuple(index[0] for index in diff_indices)
-            #             print(f"\nFirst difference at index {first_diff}")
-            #             if len(original_obs[comp].shape) > 1:
-            #                 print("Original slice:")
-            #                 print(original_obs[comp][first_diff[0]])
-            #                 print("New slice:")
-            #                 print(new_obs[comp][first_diff[0]])
+                    # 如果是多维数组，打印第一个不同的位置的完整切片
+                    if len(diff_indices[0]) > 0:
+                        first_diff = tuple(index[0] for index in diff_indices)
+                        print(f"\nFirst difference at index {first_diff}")
+                        if len(original_obs[comp].shape) > 1:
+                            print("Original slice:")
+                            print(original_obs[comp][first_diff[0]])
+                            print("New slice:")
+                            print(new_obs[comp][first_diff[0]])
         #break
     
     
@@ -404,11 +403,13 @@ async def handle_connection(reader, writer):
                     raise ValueError("Missing required keys in obs_dict")
                 
                 # 创建observation
+                print(obs_dict)
                 obs = create_obs(obs_dict)
                 #print(f"Created observation: {obs}")
                 
                 # 获取动作索引并转换为Action枚举
                 action_ind = nn_agent.make_action(obs)
+                print(f"action_id: {action_ind}")
                 action = Action(action_ind)  # 将整数转换为Action枚举
                 print(f"action: {action.name} ({action.value})")
                 writer.write(action.name.encode() + b'\n')
@@ -507,11 +508,27 @@ def test_server():
         test_dicts = [
             # 初始状态：只有手牌
             {
-                'hand_cards': ['S9', 'H8'],
+                'hand_cards': ['S2', 'H8'],
+                'public_cards': [],
+                'history': [ [(0, 3, [0, 1, 2, 3, 4])] ],
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (96, 98),
+                'current_player': 1
+            },
+            {
+                'hand_cards': ['S2', 'H8'],
                 'public_cards': [],
                 'history': [],
-                'legal_actions': [0, 1, 2],
-                'stakes': (0, 0),
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (100, 100),
+                'current_player': 0
+            },
+            {
+                'hand_cards': ['S8', 'H8'],
+                'public_cards': [],
+                'history': [],
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (5, 5),
                 'current_player': 0
             },
             # Flop状态：3张公共牌
@@ -519,33 +536,33 @@ def test_server():
                 'hand_cards': ['S9', 'H8'],
                 'public_cards': ['C8', 'D8', 'C5'],
                 'history': [[(0, 1, [0, 1, 2]), (1, 1, [0, 1, 2])]],
-                'legal_actions': [0, 1, 2],
-                'stakes': (0, 0),
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (100, 100),
                 'current_player': 0
             },
             # Turn状态：4张公共牌
             {
-                'hand_cards': ['SK', 'SJ'],
+                'hand_cards': ['SA', 'CA'],
                 'public_cards': ['DJ', 'CT', 'D6', 'CJ'],
                 'history': [
                     [(0, 2, [0, 1, 2]), (1, 1, [0, 1, 2])],
-                    [(0, 2, [0, 1, 2]), (1, 1, [0, 1, 2])]
+                    [(1, 2, [0, 1, 2]), (0, 1, [0, 1, 2])]
                 ],
-                'legal_actions': [0, 1, 2],
-                'stakes': (0, 0),
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (5, 5),
                 'current_player': 1
             },
             # River状态：5张公共牌
             {
-                'hand_cards': ['SK', 'SJ'],
+                'hand_cards': ['SK', 'CK'],
                 'public_cards': ['DJ', 'CT', 'D6', 'CJ', 'C9'],
                 'history': [
                     [(0, 2, [0, 1, 2]), (1, 1, [0, 1, 2])],
                     [(0, 2, [0, 1, 2]), (1, 1, [0, 1, 2])],
                     [(0, 2, [0, 1, 2]), (1, 1, [0, 1, 2])]
                 ],
-                'legal_actions': [0, 1, 2],
-                'stakes': (0, 0),
+                'legal_actions': [0, 1, 2, 3, 4],
+                'stakes': (100, 100),
                 'current_player': 1
             }
         ]
@@ -559,7 +576,7 @@ def test_server():
     asyncio.run(run_test_client())
 
 
-test_obs_creation()
+#test_obs_creation()
 #test_server()
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
     'env': 'NlHoldemEnvWithOpponent',
     'sample_batch_size': 50,
     'train_batch_size': 1000,
-    'num_workers': 36,
+    'num_workers': 33,
     'num_envs_per_worker': 1,
     #'broadcast_interval': 5,
     #'max_sample_requests_in_flight_per_worker': 1,
