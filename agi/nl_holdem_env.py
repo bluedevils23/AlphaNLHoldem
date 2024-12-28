@@ -27,7 +27,7 @@ class NlHoldemEnvWrapper():
             }
         )
         set_seed(seed)
-        self.action_num = 5
+        self.action_num = 10
         
         
         space = {
