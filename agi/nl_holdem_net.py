@@ -24,7 +24,7 @@ class NlHoldemNet(TFModelV2):
             shape=(4, 13, 6), name="card_info")
         
         input_action_info = tf.keras.layers.Input(
-            shape=(4, 5, 25), name="action_info")
+            shape=(4, 10, 25), name="action_info")
         
         input_extra_info = tf.keras.layers.Input(
             shape=(2,), name="extra_info")
@@ -112,7 +112,7 @@ class NlHoldemNet(TFModelV2):
             kernel_initializer=normc_initializer(0.01))(fc_out)
             
         conv_out = tf.keras.layers.Dense(
-            5,
+            10,
             name="conv_fuse",
             activation=None,
             kernel_initializer=normc_initializer(0.01))(

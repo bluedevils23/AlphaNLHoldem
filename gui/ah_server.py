@@ -77,12 +77,20 @@ print(
 
 #%%
 
-class Action(Enum):
+class Action:
     FOLD = 0
     CHECK_CALL = 1
     RAISE_HALF_POT = 2
     RAISE_POT = 3
     ALL_IN = 4
+    
+    # Newly added actions
+    RAISE_ONETHIRD_POT = 5
+    RAISE_THREEFOURTH_POT = 6
+    RAISE_ONEANDHALF_POT = 7
+    RAISE_TWO_POT = 8
+    RAISE_THREE_POT = 9
+
 
 def create_obs(obs_dict=None):
     """
@@ -118,15 +126,15 @@ def create_obs(obs_dict=None):
     if public_cards is None:
         public_cards = []
     if legal_actions is None:
-        legal_actions = list(range(5))  # All actions legal by default
+        legal_actions = list(range(10))  # All actions legal by default
     if stakes is None:
         stakes = (0, 0)
         
     # Initialize observation components
     card_info = np.zeros([4, 13, 6], np.uint8)
-    action_info = np.zeros([4, 5, 25], np.uint8)
+    action_info = np.zeros([4, 10, 25], np.uint8)  # Increased to 10 actions, kept third dimension at 25
     extra_info = np.zeros([2], np.uint8)
-    legal_actions_info = np.zeros([5], np.uint8)
+    legal_actions_info = np.zeros([10], np.uint8)  # Increased to match new action count
     
     # Set legal actions
     for ind in legal_actions:
@@ -237,7 +245,7 @@ def create_obs_from_env_state(env):
         history[current_stage].append([
             player_id,
             action_type,
-            [0,1,2,3,4]  # 所有可能的动作
+            [0,1,2,3,4,5,6,7,8,9]  # 所有可能的动作
         ])
     print('history:', history)
     print('env_history:', env.history)
