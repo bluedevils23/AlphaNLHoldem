@@ -14,6 +14,8 @@ from tqdm import tqdm
 import pandas as pd
 from agi.evaluation_tools import NNAgent,death_match
 
+import tensorflow as tf
+
 #%%
 
 conf = eval(open("../confs/nl_holdem.py").read().strip())
@@ -25,7 +27,7 @@ env = NlHoldemEnvWrapper(
 )
 
 #%%
-i = 1102
+i = 441
 nn_agent = NNAgent(env.observation_space,
                        env.action_space,
                        conf,
@@ -46,15 +48,16 @@ for i in tqdm(range(1)):
         action_ind = nn_agent.make_action(obs)
         obs,r,d,i = env.step(action_ind)
 
-        print(obs.keys())
-        print('card_info:\n')
-        print(obs['card_info'])
-        print('action_info:\n')
-        print(obs['action_info'])
-        print('legal_moves:\n')
-        print(obs['legal_moves'])
-        print('extra_info:\n')
-        print(obs['extra_info'])
+    
+        # print(obs.keys())
+        # print('card_info:\n')
+        # print(obs['card_info'])
+        # print('action_info:\n')
+        # print(obs['action_info'])
+        # print('legal_moves:\n')
+        # print(obs['legal_moves'])
+        # print('extra_info:\n')
+        # print(obs['extra_info'])
     #break
 
 #%%
@@ -77,13 +80,12 @@ print(
 
 #%%
 
-class Action:
+class Action(Enum):
     FOLD = 0
     CHECK_CALL = 1
     RAISE_HALF_POT = 2
     RAISE_POT = 3
     ALL_IN = 4
-    
     # Newly added actions
     RAISE_ONETHIRD_POT = 5
     RAISE_THREEFOURTH_POT = 6
@@ -399,7 +401,6 @@ async def handle_connection(reader, writer):
             if not data:
                 print(f"Connection closed by {addr}")
                 break
-                
             try:
                 # 解析接收到的JSON数据
                 obs_dict = json.loads(data.decode().strip())
@@ -417,7 +418,6 @@ async def handle_connection(reader, writer):
                 
                 # 获取动作索引并转换为Action枚举
                 action_ind = nn_agent.make_action(obs)
-                print(f"action_id: {action_ind}")
                 action = Action(action_ind)  # 将整数转换为Action枚举
                 print(f"action: {action.name} ({action.value})")
                 writer.write(action.name.encode() + b'\n')
@@ -560,6 +560,19 @@ def test_server():
                 'stakes': (5, 5),
                 'current_player': 1
             },
+
+            {
+                'hand_cards': ['H4', 'HA'],
+                'public_cards': ['HJ', 'HQ', 'H9', 'S3'],
+                'history': [
+                    [(1, 3, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), (0, 1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])], 
+                    [(0, 5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), (1, 1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])], 
+                    [(0, 5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])], []
+                ],
+                'legal_actions': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                'stakes': (49, 52),
+                'current_player': 1
+            },
             # River状态：5张公共牌
             {
                 'hand_cards': ['SK', 'CK'],
@@ -573,6 +586,7 @@ def test_server():
                 'stakes': (100, 100),
                 'current_player': 1
             }
+            
         ]
         
         for test_dict in test_dicts:
@@ -585,7 +599,7 @@ def test_server():
 
 
 #test_obs_creation()
-#test_server()
+test_server()
 
 if __name__ == "__main__":
     # 如果直接运行此文件，启动服务器
