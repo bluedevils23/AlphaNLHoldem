@@ -433,21 +433,22 @@ class Main:
             else:
                 actions = 'c/' ### teminate current bet round
         elif decision == OpenHoldem.getSymbol("RaiseHalfPot"):
-            actions = 'r'+ str(int(0.5 * self.pot/self.rate))
+            raiseToAmount = int(0.5 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("RaiseTwoThirdPot"):
-            actions = 'r'+ str(int(0.67 * self.pot/self.rate))
+            raiseToAmount = int(0.67 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("RaiseThreeFourthPot"):
-            actions = 'r'+ str(int(0.75 * self.pot/self.rate))
+            raiseToAmount = int(0.75 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("RaisePot"):
-            actions = 'r'+ str(int(self.pot/self.rate))
+            raiseToAmount = int(self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("f$RaisePotOneAndHalf"):
-            actions = 'r'+ str(int(1.5 * self.pot/self.rate))
+            raiseToAmount = int(1.5 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("f$RaisePot2"):
-            actions = 'r'+ str(int(2 * self.pot/self.rate))
+            raiseToAmount = int(2 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("f$RaisePot3"):
-            actions = 'r'+ str(int(3 * self.pot/self.rate))
+            raiseToAmount = int(3 * self.pot/self.rate)
         elif decision == OpenHoldem.getSymbol("RaiseMax"):
-            actions = 'r'+ str(int(self.oh['StackSize']/self.rate))
+            raiseToAmount = int(self.oh['StackSize']/self.rate)
+        actions = str(raiseToAmount + int(self.oh['AmountToCall']*self.serverBigBlind))
         #logger.info('actionsall:%s' % self.actionsAll)
         self.actionsAll = self.actionsAll + actions
         logger.info('actionsall:%s' % self.actionsAll)
