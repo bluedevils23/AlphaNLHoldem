@@ -433,22 +433,21 @@ class Main:
             else:
                 actions = 'c/' ### teminate current bet round
         elif decision == OpenHoldem.getSymbol("RaiseHalfPot"):
-            raiseToAmount = int(0.5 * self.pot/self.rate)
+            actions = 'r'+ str(int(0.5 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("RaiseTwoThirdPot"):
-            raiseToAmount = int(0.67 * self.pot/self.rate)
+            actions = 'r'+ str(int(0.67 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("RaiseThreeFourthPot"):
-            raiseToAmount = int(0.75 * self.pot/self.rate)
+            actions = 'r'+ str(int(0.75 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("RaisePot"):
-            raiseToAmount = int(self.pot/self.rate)
+            actions = 'r'+ str(int(self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("f$RaisePotOneAndHalf"):
-            raiseToAmount = int(1.5 * self.pot/self.rate)
+            actions = 'r'+ str(int(1.5 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("f$RaisePot2"):
-            raiseToAmount = int(2 * self.pot/self.rate)
+            actions = 'r'+ str(int(2 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("f$RaisePot3"):
-            raiseToAmount = int(3 * self.pot/self.rate)
+            actions = 'r'+ str(int(3 * self.pot/self.rate))
         elif decision == OpenHoldem.getSymbol("RaiseMax"):
-            raiseToAmount = int(self.oh['StackSize']/self.rate)
-        actions = str(raiseToAmount + int(self.oh['AmountToCall']*self.serverBigBlind))
+            actions = 'r'+ str(int(self.oh['StackSize']/self.rate))
         #logger.info('actionsall:%s' % self.actionsAll)
         self.actionsAll = self.actionsAll + actions
         logger.info('actionsall:%s' % self.actionsAll)
@@ -541,45 +540,54 @@ class Main:
     def calculateOpponentRaiseAmount(self):
         raiseRatio = int( self.oh['AmountToCall'] ) / ( int(self.oh['PotSize']) - int(self.oh['AmountToCall']) )
         logger.info('raiseRatio:%f' % raiseRatio)
-        if raiseRatio <= 0.35:
-            return 'RAISE_ONETHIRD_POT'
-        elif raiseRatio <= 0.55:
+        if raiseRatio <= 0.55:
             return 'RaiseHalfPot'
-        elif raiseRatio <= 0.8:
-            return 'RAISE_THREEFOURTH_POT'
         elif raiseRatio <= 1.2:
             return 'RaisePot'
-        elif raiseRatio <= 1.6:
-            return 'RAISE_ONEANDHALF_POT'
-        elif raiseRatio <= 2.1:
-            return 'RAISE_TWO_POT'
-        elif raiseRatio <= 3.1:
-            return 'RAISE_THREE_POT'
         else:
             return 'RaiseMax'
+        
+        ### Actions fit 10 action space
+        # if raiseRatio <= 0.35:
+            # return 'RAISE_ONETHIRD_POT'
+        # elif raiseRatio <= 0.55:
+            # return 'RaiseHalfPot'
+        # elif raiseRatio <= 0.8:
+            # return 'RAISE_THREEFOURTH_POT'
+        # elif raiseRatio <= 1.2:
+            # return 'RaisePot'
+        # elif raiseRatio <= 1.6:
+            # return 'RAISE_ONEANDHALF_POT'
+        # elif raiseRatio <= 2.1:
+            # return 'RAISE_TWO_POT'
+        # elif raiseRatio <= 3.1:
+            # return 'RAISE_THREE_POT'
+        # else:
+            # return 'RaiseMax'
 
 
     def addOpponentAction(self, myPosition, betround, actionName):
         betroundDict = {1: 'preflop', 2: 'flop', 3: 'turn', 4: 'river'}
+        legalMoves = [0, 1, 2, 3, 4]
         opponentPostion = 1 - myPosition
         if actionName == "Check" or actionName == "Call" or actionName == "CheckCall":
-            action = [opponentPostion, 1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 1, legalMoves]
         elif actionName == "RaiseHalfPot":
-            action = [opponentPostion, 2, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 2, legalMoves]
         elif actionName == "RaisePot":
-            action = [opponentPostion, 3, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 3, legalMoves]
         elif actionName == "RaiseMax":
-            action = [opponentPostion, 4, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 4, legalMoves]
         elif actionName == "RAISE_ONETHIRD_POT":
-            action = [opponentPostion, 5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 5, legalMoves]
         elif actionName == "RAISE_THREEFOURTH_POT":
-            action = [opponentPostion, 6, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 6, legalMoves]
         elif actionName == "RAISE_ONEANDHALF_POT":
-            action = [opponentPostion, 7, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 7, legalMoves]
         elif actionName == "RAISE_TWO_POT":
-            action = [opponentPostion, 8, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 8, legalMoves]
         elif actionName == "RAISE_THREE_POT":
-            action = [opponentPostion, 9, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [opponentPostion, 9, legalMoves]
         else:
             logger.info('unknown actionName:%s' % actionName)
         logger.info('add opponent action:%s' % action)
@@ -589,26 +597,27 @@ class Main:
 
     def addMyAction(self, myPosition, betround, actionName):
         betroundDict = {1: 'preflop', 2: 'flop', 3: 'turn', 4: 'river'}
+        legalMoves = [0, 1, 2, 3, 4]
         if actionName == "Fold":
-            action = [myPosition, 0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 0, legalMoves]
         elif actionName == "Check" or actionName == "Call" or actionName == "CheckCall":
-            action = [myPosition, 1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 1, legalMoves]
         elif actionName == "RaiseHalfPot":
-            action = [myPosition, 2, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 2, legalMoves]
         elif actionName == "RaisePot":
-            action = [myPosition, 3, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 3, legalMoves]
         elif actionName == "RaiseMax":
-            action = [myPosition, 4, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 4, legalMoves]
         elif actionName == "RAISE_ONETHIRD_POT":
-            action = [myPosition, 5, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 5, legalMoves]
         elif actionName == "RAISE_THREEFOURTH_POT":
-            action = [myPosition, 6, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 6, legalMoves]
         elif actionName == "RAISE_ONEANDHALF_POT":
-            action = [myPosition, 7, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 7, legalMoves]
         elif actionName == "RAISE_TWO_POT":
-            action = [myPosition, 8, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 8, legalMoves]
         elif actionName == "RAISE_THREE_POT":
-            action = [myPosition, 9, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+            action = [myPosition, 9, legalMoves]
         else:
             logger.info('unknown actionName:%s' % actionName)
         logger.info('add my action:%s' % action)
@@ -682,7 +691,7 @@ class Main:
                  'Choose my best action from "Fold", "CheckCall", "RaiseHalfPot", "RaisePot" only. Your response just json, no other text.'
         api_url = "https://api.openai.com/v1/chat/completions"  # Replace with the actual ChatGPT API endpoint
         headers = {
-            "Authorization": f"Bearer sk-proj-QZRx...",  # Replace with your actual API key
+            "Authorization": f"Bearer sk-proj-QZRx-",  # Replace with your actual API key
             "Content-Type": "application/json"
         }
         data = {
@@ -704,7 +713,7 @@ class Main:
         print(prompt)
         api_url = "https://api.deepseek.com/chat/completions"  # Replace with the actual DeepSeek API endpoint
         headers = {
-            "Authorization": f"Bearer sk-bbfa44...",  # Replace with your actual API key
+            "Authorization": f"Bearer sk-",  # Replace with your actual API key
             "Content-Type": "application/json"
         }
         data = {
@@ -720,9 +729,9 @@ class Main:
             return f"Error: {response.status_code}, {response.text}"
 
     def getLLamaFactoryResponse(self, prompt):
-        # prompt = 'As you are a professional Texas Holdem player, You are in a Headsup no limit holdem game\n' + prompt + \
-        #          'Choose my best action from "Fold", "CheckCall", "RaiseHalfPot", "RaisePot" only. Your response just json, no other text.'
-        api_url = "http://10.0.0.207:8000/v1/chat/completions"  # Replace with the actual ChatGPT API endpoint
+        prompt = 'You are Deepstack, a specialist in playing heads up No Limit Texas Holdem. The following will be a game scenario and you need to make the opimal decision.\n\nHere is a game summary:\n' + prompt + \
+                 '\nDecide on an action based on the strength of your hand on this board, your position, and actions before you. Do not explain your answer.\nYour optimal action is:'
+        api_url = "http://10.0.0.129:8000/v1/chat/completions"  # Replace with the actual ChatGPT API endpoint
         headers = {
             "Authorization": f"aaa",  # Replace with your actual API key
             "Content-Type": "application/json"
@@ -730,7 +739,7 @@ class Main:
         data = {
             "model": "gemma3",  # Specify the model you want to use
             "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 1500,  # Adjust the token limit as needed
+            "max_tokens": 2408,  # Adjust the token limit as needed
             "temperature": 0
         }
         response = requests.post(api_url, headers=headers, json=data)
@@ -843,195 +852,196 @@ class Main:
         pprint(history)
         return "\n".join(history)
         
-    # def getDecision3(self):
-    #     """
-    #     使用新的JSON格式与服务器通信来获取决策
-    #     """
-    #     import json
-    #     import socket
-    #     # 更新变量
-    #     #return OpenHoldem.getSymbol("f$betpot_1_2")
-    #     decision = 0.0
-    #     position = -1
-    #     self.pot = -1
-    #     self.updateVars()
-    #     self.rate = self.oh['bblind']/self.serverBigBlind
-    #     # if self.oh['pot'] == 0:
-    #     #     self.pot = self.oh['bblind'] + self.oh['sblind']
-    #     # else:
-    #     #     self.pot = self.oh['pot']
-    #     self.pot = self.oh['pot']
-    #     if self.oh['bigblindchair'] == self.oh['userchair']:
-    #         position = 1
-    #         self.opponentChair = self.oh['smallblindchair']
-    #     else:
-    #         position = 0
-    #         self.opponentChair = self.oh['bigblindchair']
-    #     #rlcard and alpha holdem server use different position
-    #     position = 1 - position
+    def getDecision3(self):
+        """
+        使用新的JSON格式与服务器通信来获取决策
+        """
+        import json
+        import socket
+        # 更新变量
+        #return OpenHoldem.getSymbol("f$betpot_1_2")
+        decision = 0.0
+        position = -1
+        self.pot = -1
+        self.updateVars()
+        self.rate = self.oh['bblind']/self.serverBigBlind
+        # if self.oh['pot'] == 0:
+        #     self.pot = self.oh['bblind'] + self.oh['sblind']
+        # else:
+        #     self.pot = self.oh['pot']
+        self.pot = self.oh['pot']
+        if self.oh['bigblindchair'] == self.oh['userchair']:
+            position = 1
+            self.opponentChair = self.oh['smallblindchair']
+        else:
+            position = 0
+            self.opponentChair = self.oh['bigblindchair']
+        #rlcard and alpha holdem server use different position
+        position = 1 - position
 
-    #     hole = self.getHand()
-    #     board = self.getBoard()
+        hole = self.getHand()
+        board = self.getBoard()
 
-    #     # logger.info(OpenHoldem.GetHandnumber())
-    #     # handNo = int(OpenHoldem.GetHandnumber())
-    #     ### New hand here
-    #     # if self.lastHandNo != handNo:
-    #     #     self.lastHandNo = handNo
-    #     #     self.actionsAll = ''
-    #     ### 888poker doesnt support handnumber, calc handnumber by our code.
-    #     ### TODO: We may get 2 same hands.
-    #     if self.lastHole != hole:
-    #         self.lastHole = hole
-    #         self.lastHandNo = self.lastHandNo + 1
-    #         self.actionsAll = [[], [], [], []]  # preflop, flop, turn, river
-    #         self.actionsAllReadable = ''
-    #         logger.info('\n\n')
-    #         logger.info('Starting new handNo:%d', self.lastHandNo)
-    #     handNo = self.lastHandNo
+        # logger.info(OpenHoldem.GetHandnumber())
+        # handNo = int(OpenHoldem.GetHandnumber())
+        ### New hand here
+        # if self.lastHandNo != handNo:
+        #     self.lastHandNo = handNo
+        #     self.actionsAll = ''
+        ### 888poker doesnt support handnumber, calc handnumber by our code.
+        ### TODO: We may get 2 same hands.
+        if self.lastHole != hole:
+            self.lastHole = hole
+            self.lastHandNo = self.lastHandNo + 1
+            self.actionsAll = [[], [], [], []]  # preflop, flop, turn, river
+            self.actionsAllReadable = ''
+            logger.info('\n\n')
+            logger.info('Starting new handNo:%d', self.lastHandNo)
+        handNo = self.lastHandNo
 
-    #     log_info = ''
-    #     log_info += '---------------------\n'
-    #     log_info += 'handNo:%s\n' % handNo
-    #     betroundDict = {1: 'preflop', 2: 'flop', 3: 'turn', 4: 'river'}
-    #     log_info += 'betround:%s\n' % betroundDict[self.betround]
-    #     if position == 1:
-    #         log_info += 'position:sblind\n'
-    #     else:
-    #         log_info += 'position:bblind\n'
-    #     log_info += 'sblind:%s\n' % self.oh['sblind']
-    #     log_info += 'bblind:%s\n' % self.oh['bblind']
-    #     log_info += 'MaxOpponentStackSize:%s\n' % self.oh['MaxOpponentStackSize']
-    #     log_info += 'MaxStacksizeOfActiveOpponents:%s bb\n' % self.oh['MaxStacksizeOfActiveOpponents']
-    #     log_info += 'MyStackSize:%s bb\n' % self.oh['StackSize']
-    #     log_info += 'PotSize:%s bb\n' % self.oh['PotSize']
-    #     log_info += 'hand:%s\n' % hole
-    #     log_info += 'board:%s\n' % str(board)
-    #     log_info += 'pot:%s\n' % self.oh['pot']
-    #     #log_info += 'previousBetround:%d\n' % betroundDict[self.previousBetround]
-    #     self.generateOpponentAction(position)
-    #     log_info += self.actionsAllReadable
-    #     log_info += '---------------------\n'
-    #     logger.info(log_info)
-    #     #print(self.getChatgptResponse(log_info))
-    #     #myAction = self.getDeepseekResponse(log_info).strip()
-    #     pokerstars_history = self.convertToPokerStarsFormat({
-    #         'handNo': handNo,
-    #         'betround': self.betround,
-    #         'position': position,
-    #         'sblind': self.oh['sblind'],
-    #         'bblind': self.oh['bblind'],
-    #         'MaxOpponentStackSize': self.oh['MaxOpponentStackSize'],
-    #         'MaxStacksizeOfActiveOpponents': self.oh['MaxStacksizeOfActiveOpponents'],
-    #         'StackSize': self.oh['StackSize'],
-    #         'PotSize': self.oh['PotSize'],
-    #         'hand': hole,
-    #         'board': board,
-    #         'pot': self.oh['pot']
-    #     })
-    #     myAction = self.getLLamaFactoryResponse(pokerstars_history).strip('{"}')
-    #     print('\n\n'+myAction+'\n\n\n')
-    #     print('\n')
-    #     self.addMyAction(position, self.betround, myAction)
-    #     if myAction == 'CheckCall':
-    #         return OpenHoldem.getSymbol('Call')
-    #     return OpenHoldem.getSymbol(myAction)
+        log_info = ''
+        log_info += '\n---------------------\n'
+        log_info += 'handNo:%s\n' % handNo
+        betroundDict = {1: 'preflop', 2: 'flop', 3: 'turn', 4: 'river'}
+        log_info += 'betround:%s\n' % betroundDict[self.betround]
+        if position == 0:
+            log_info += 'position:bblind\n'
+        else:
+            log_info += 'position:sblind\n'
+        log_info += 'sblind:%s\n' % self.oh['sblind']
+        log_info += 'bblind:%s\n' % self.oh['bblind']
+        log_info += 'MaxOpponentStackSize:%s\n' % self.oh['MaxOpponentStackSize']
+        log_info += 'MaxStacksizeOfActiveOpponents:%s bb\n' % self.oh['MaxStacksizeOfActiveOpponents']
+        log_info += 'MyStackSize:%s bb\n' % self.oh['StackSize']
+        log_info += 'PotSize:%s bb\n' % self.oh['PotSize']
+        log_info += 'hand:%s\n' % hole
+        log_info += 'board:%s\n' % str(board)
+        log_info += 'pot:%s\n' % self.oh['pot']
+        #log_info += 'previousBetround:%d\n' % betroundDict[self.previousBetround]
+        self.generateOpponentAction(position)
+        log_info += self.actionsAllReadable
+        log_info += '---------------------\n'
+        logger.info(log_info)
+        #print(self.getChatgptResponse(log_info))
+        #myAction = self.getDeepseekResponse(log_info).strip()
+        pokerstars_history = self.convertToPokerStarsFormat({
+            'handNo': handNo,
+            'betround': self.betround,
+            'position': position,
+            'sblind': self.oh['sblind'],
+            'bblind': self.oh['bblind'],
+            'MaxOpponentStackSize': self.oh['MaxOpponentStackSize'],
+            'MaxStacksizeOfActiveOpponents': self.oh['MaxStacksizeOfActiveOpponents'],
+            'StackSize': self.oh['StackSize'],
+            'PotSize': self.oh['PotSize'],
+            'hand': hole,
+            'board': board,
+            'pot': self.oh['pot']
+        })
+        # myAction = self.getLLamaFactoryResponse(pokerstars_history).strip('{"}')
+        # print('\n\n'+myAction+'\n\n\n')
+        # print('\n')
+        # self.addMyAction(position, self.betround, myAction)
+        # if myAction == 'CheckCall':
+            # return OpenHoldem.getSymbol('Call')
+        # return OpenHoldem.getSymbol(myAction)
         
-    #     logger.info('GenerateOpponentAction ActionsAll:%s' % self.actionsAll)
+        logger.info('GenerateOpponentAction ActionsAll:%s' % self.actionsAll)
 
-    #     # 获取手牌和公共牌
-    #     hand_cards = []
-    #     public_cards = []
+        # 获取手牌和公共牌
+        hand_cards = []
+        public_cards = []
         
-    #     # 转换手牌
-    #     if self.oh['$$pr0'] > 0:
-    #         hand_cards.append(self.convertSuit(self.oh['$$ps0']) + self.convertCard(self.oh['$$pr0']))
-    #     if self.oh['$$pr1'] > 0:
-    #         hand_cards.append(self.convertSuit(self.oh['$$ps1']) + self.convertCard(self.oh['$$pr1']))
+        # 转换手牌
+        if self.oh['$$pr0'] > 0:
+            hand_cards.append(self.convertSuit(self.oh['$$ps0']) + self.convertCard(self.oh['$$pr0']))
+        if self.oh['$$pr1'] > 0:
+            hand_cards.append(self.convertSuit(self.oh['$$ps1']) + self.convertCard(self.oh['$$pr1']))
             
-    #     # 转换公共牌
-    #     for i in range(5):
-    #         if self.oh[f'$$cr{i}'] > 0:
-    #             public_cards.append(self.convertSuit(self.oh[f'$$cs{i}']) + self.convertCard(self.oh[f'$$cr{i}']))
+        # 转换公共牌
+        for i in range(5):
+            if self.oh[f'$$cr{i}'] > 0:
+                public_cards.append(self.convertSuit(self.oh[f'$$cs{i}']) + self.convertCard(self.oh[f'$$cr{i}']))
 
-    #     # 设置双方筹码量
-    #     if self.oh['StackSize'] >= self.oh['MaxStacksizeOfActiveOpponents']:
-    #         myStackSize = int( 2 * (self.oh['MaxStacksizeOfActiveOpponents'] + self.oh['AmountToCall']) )
-    #         opponentStackSize = int( 2 * self.oh['MaxStacksizeOfActiveOpponents'] )
-    #     else:
-    #         myStackSize = int( 2 * self.oh['StackSize'] )
-    #         opponentStackSize = int( 2 * (self.oh['StackSize'] - self.oh['AmountToCall']) )
-    #     if position == 0:
-    #         stakes = (myStackSize, opponentStackSize)
-    #     else:
-    #         stakes = (opponentStackSize, myStackSize)
-    #     # 构建obs_dict
-    #     obs_dict = {
-    #         'hand_cards': hand_cards,
-    #         'public_cards': public_cards,
-    #         'history': self.actionsAll,
-    #         'legal_actions': list(range(10)),  # 默认所有动作合法
-    #         'stakes': stakes,  # 使用当前余额
-    #         'current_player': position  # 0 SB, 1 BB
-    #     }
+        # 设置双方筹码量
+        if self.oh['StackSize'] >= self.oh['MaxStacksizeOfActiveOpponents']:
+            myStackSize = int( 2 * (self.oh['MaxStacksizeOfActiveOpponents'] + self.oh['AmountToCall']) )
+            opponentStackSize = int( 2 * self.oh['MaxStacksizeOfActiveOpponents'] )
+        else:
+            myStackSize = int( 2 * self.oh['StackSize'] )
+            opponentStackSize = int( 2 * (self.oh['StackSize'] - self.oh['AmountToCall']) )
+        if position == 0: #We are BB
+            stakes = (myStackSize, opponentStackSize)
+        else: #We are SB
+            stakes = (opponentStackSize, myStackSize)
+        # 构建obs_dict
+        obs_dict = {
+            'hand_cards': hand_cards,
+            'public_cards': public_cards,
+            'history': self.actionsAll,
+            'legal_actions': list(range(5)),  # 默认所有动作合法
+            'stakes': stakes,  # 使用当前余额
+            'current_player': position  # 0 BB, 1 SB
+        }
         
-    #     try:
-    #         # 连接到服务器
-    #         self.addMyAction(position, self.betround, 'Call')
-    #         return OpenHoldem.getSymbol("Call")
-    #         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #             s.connect(('10.164.136.173', 8888))
+        try:
+            # 连接到服务器
+            # self.addMyAction(position, self.betround, 'Call')
+            # return OpenHoldem.getSymbol("Call")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect(('10.0.0.207', 8888))
                 
-    #             # 发送obs_dict
-    #             s.sendall(json.dumps(obs_dict).encode() + b'\n')
+                # 发送obs_dict
+                s.sendall(json.dumps(obs_dict).encode() + b'\n')
                 
-    #             # 接收响应
-    #             response = s.recv(1024).decode().strip()
-    #             time.sleep(1)
-    #             # 将响应转换为决策
-    #             if response == "FOLD":
-    #                 self.addMyAction(position, self.betround, 'Fold')
-    #                 return OpenHoldem.getSymbol("Fold")
-    #             elif response == "CHECK_CALL":
-    #                 self.addMyAction(position, self.betround, 'CheckCall')
-    #                 return OpenHoldem.getSymbol("Call")
-    #             elif response == "RAISE_HALF_POT":
-    #                 self.addMyAction(position, self.betround, 'RaiseHalfPot')
-    #                 return OpenHoldem.getSymbol("RaiseHalfPot")
-    #             elif response == "RAISE_POT":
-    #                 self.addMyAction(position, self.betround, 'RaisePot')
-    #                 return OpenHoldem.getSymbol("RaisePot")
-    #             elif response == "ALL_IN":
-    #                 self.addMyAction(position, self.betround, 'RaiseMax')
-    #                 return OpenHoldem.getSymbol("RaiseMax")
-    #             # Newly added actions by Yang
-    #             elif response == "RAISE_ONETHIRD_POT":
-    #                 self.addMyAction(position, self.betround, 'RAISE_ONETHIRD_POT')
-    #                 if self.oh['PotSize'] < 3:
-    #                     return OpenHoldem.getSymbol("RaiseHalfPot")
-    #                 else:
-    #                     return int( self.oh['PotSize'] * 1/3)
-    #             elif response == "RAISE_THREEFOURTH_POT":
-    #                 self.addMyAction(position, self.betround, 'RAISE_THREEFOURTH_POT')
-    #                 return int( self.oh['PotSize'] * 3/4)
-    #             elif response == "RAISE_ONEANDHALF_POT":
-    #                 self.addMyAction(position, self.betround, 'RAISE_ONEANDHALF_POT')
-    #                 return int( self.oh['PotSize'] * 1.5)
-    #             elif response == "RAISE_TWO_POT":
-    #                 self.addMyAction(position, self.betround, 'RAISE_TWO_POT')
-    #                 return int( self.oh['PotSize'] * 2)
-    #             elif response == "RAISE_THREE_POT":
-    #                 self.addMyAction(position, self.betround, 'RAISE_THREE_POT')
-    #                 return int( self.oh['PotSize'] * 3)
-    #             else:
-    #                 self.addMyAction(position, self.betround, 'CheckCall')
-    #                 return OpenHoldem.getSymbol("Call")  # 默认Call
+                # 接收响应
+                response = s.recv(1024).decode().strip()
+                print('\n\n' + response + '\n\n')
+                time.sleep(2)
+                # 将响应转换为决策
+                if response == "FOLD":
+                    self.addMyAction(position, self.betround, 'Fold')
+                    return OpenHoldem.getSymbol("Fold")
+                elif response == "CHECK_CALL":
+                    self.addMyAction(position, self.betround, 'CheckCall')
+                    return OpenHoldem.getSymbol("Call")
+                elif response == "RAISE_HALF_POT":
+                    self.addMyAction(position, self.betround, 'RaiseHalfPot')
+                    return OpenHoldem.getSymbol("RaiseHalfPot")
+                elif response == "RAISE_POT":
+                    self.addMyAction(position, self.betround, 'RaisePot')
+                    return OpenHoldem.getSymbol("RaisePot")
+                elif response == "ALL_IN":
+                    self.addMyAction(position, self.betround, 'RaiseMax')
+                    return OpenHoldem.getSymbol("RaiseMax")
+                # Newly added actions by Yang
+                elif response == "RAISE_ONETHIRD_POT":
+                    self.addMyAction(position, self.betround, 'RAISE_ONETHIRD_POT')
+                    if self.oh['PotSize'] < 3:
+                        return OpenHoldem.getSymbol("RaiseHalfPot")
+                    else:
+                        return int( self.oh['PotSize'] * 1/3)
+                elif response == "RAISE_THREEFOURTH_POT":
+                    self.addMyAction(position, self.betround, 'RAISE_THREEFOURTH_POT')
+                    return int( self.oh['PotSize'] * 3/4)
+                elif response == "RAISE_ONEANDHALF_POT":
+                    self.addMyAction(position, self.betround, 'RAISE_ONEANDHALF_POT')
+                    return int( self.oh['PotSize'] * 1.5)
+                elif response == "RAISE_TWO_POT":
+                    self.addMyAction(position, self.betround, 'RAISE_TWO_POT')
+                    return int( self.oh['PotSize'] * 2)
+                elif response == "RAISE_THREE_POT":
+                    self.addMyAction(position, self.betround, 'RAISE_THREE_POT')
+                    return int( self.oh['PotSize'] * 3)
+                else:
+                    self.addMyAction(position, self.betround, 'CheckCall')
+                    return OpenHoldem.getSymbol("Call")  # 默认Call
                     
-    #     except Exception as e:
-    #         print(f"Error in getDecision: {e}")
-    #         time.sleep(600)
-    #         self.addMyAction(position, self.betround, 'CheckCall')
-    #         return OpenHoldem.getSymbol("Call")  # 出错时默认Call
+        except Exception as e:
+            print(f"Error in getDecision: {e}")
+            time.sleep(600)
+            self.addMyAction(position, self.betround, 'CheckCall')
+            return OpenHoldem.getSymbol("Call")  # 出错时默认Call
 
 
     def convert_to_pokerstars(self, msg):
@@ -1049,7 +1059,6 @@ class Main:
             convert_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'convert.py')
             
             # Prepare the command to run convert.py
-            stackSize = min( self.oh['StackSize'], self.oh['MaxOpponentStackSize']) * self.oh['bblind']
             cmd = [
                 'python', 
                 convert_script,
@@ -1057,7 +1066,7 @@ class Main:
                 '--table_name', 'AI Poker Match',
                 '--small_blind', str(int(self.oh['sblind'])),
                 '--big_blind', str(int(self.oh['bblind'])),
-                '--stack_size', str(int(stackSize))
+                '--stack_size', str( int( self.oh['StackSize'] * self.oh['bblind'] ))
             ]
             
             # Run the command and pass the message via stdin
